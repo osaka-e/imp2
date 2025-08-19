@@ -202,22 +202,18 @@ body {
 }
 
 /* モバイル用モーダル */
-@media (max-width: 1023px) {
-    .modal-mobile-content {
-        padding: 60px 20px; /* 内側余白を少し縮小 */
-        gap: 30px;
-    }
-
-    .modal-image-container {
-        width: 240px;
-        height: 320px;
-    }
-
-    .modal-text-content {
-        width: 100%;
-    }
+.modal-mobile {
+    display: block;
 }
-
+.modal-mobile-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 123px 59px;
+    gap: 71px;
+}
 .modal-top {
     display: flex;
     flex-direction: column;
@@ -235,6 +231,7 @@ body {
     justify-content: flex-start;
     width: 100%;
 }
+
 /* Image Container */
 .modal-image-container {
     display: flex;
