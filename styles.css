@@ -170,16 +170,18 @@ body {
     display: flex;
 }
 
-.modal-content {
+}.modal-content {
     position: relative;
     background-color: #d9d9d9;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
                 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    max-width: 1320px;
-    width: 100%;
-    margin: 0 16px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-width: 800px;       /* 最大横幅を小さく */
+    width: 90%;             /* 画面幅に応じて縮小 */
+    margin: 0 auto;         /* 中央寄せ */
+    max-height: 80vh;       /* 高さも少し小さく */
+    overflow-y: auto;       /* 内容が多い場合は縦スクロール */
+    border-radius: 12px;    /* 角を丸くして柔らかい印象 */
+    padding: 20px;          /* 内側余白 */
 }
 
 /* デスクトップ用モーダル */
