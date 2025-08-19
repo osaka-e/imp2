@@ -17,9 +17,7 @@ const mockReviews = [
     // 他のレビューも同様に...
 ];
 
-// ---------------------------
 // DOM要素の取得
-// ---------------------------
 const reviewsGrid = document.getElementById('reviewsGrid');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalImageDesktop = document.getElementById('modalImageDesktop');
@@ -28,12 +26,8 @@ const modalNameDesktop = document.getElementById('modalNameDesktop');
 const modalNameMobile = document.getElementById('modalNameMobile');
 const modalReviewDesktop = document.getElementById('modalReviewDesktop');
 const modalReviewMobile = document.getElementById('modalReviewMobile');
-const shopButtons = document.querySelectorAll('.shop-btn');
-const socialIcons = document.querySelectorAll('.social-icon');
 
-// ---------------------------
-// フォントサイズ計算
-// ---------------------------
+// 名前の長さに応じたフォントサイズを計算する関数
 function calculateFontSize(nameLength) {
     const baseSize = 20;
     const minSize = 12;
@@ -41,60 +35,51 @@ function calculateFontSize(nameLength) {
     return Math.max(minSize, Math.min(maxSize, baseSize - (nameLength - 1) * 0.5));
 }
 
-// ---------------------------
-// 口コミカード生成
-// ---------------------------
+// 口コミカードを生成する関数
 function createReviewCard(review) {
     const card = document.createElement('div');
     card.className = 'review-card';
     card.setAttribute('data-review-id', review.id);
-
+    
     const fontSize = calculateFontSize(review.name.length);
-
+    
     card.innerHTML = `
         <img src="${review.image}" alt="${review.name}" class="review-card-image" onerror="this.style.backgroundColor='#d9d9d9'; this.style.backgroundImage='none';">
         <div class="review-card-name">
             <span style="font-size: ${fontSize}px;">${review.name}</span>
         </div>
     `;
-
-    // クリックでモーダルを開く
+    
+    // カードクリックでモーダルを開く
     card.addEventListener('click', () => openModal(review));
-
+    
     return card;
 }
 
-// ---------------------------
-// モーダル開閉
-// ---------------------------
+// モーダルを開く関数
 function openModal(review) {
-    // デスクトップ・モバイル両方に反映
     modalImageDesktop.src = review.image;
     modalImageDesktop.alt = review.name;
     modalImageMobile.src = review.image;
     modalImageMobile.alt = review.name;
-
+    
     modalNameDesktop.textContent = review.name;
     modalNameMobile.textContent = review.name;
-
+    
     modalReviewDesktop.textContent = review.fullReview;
     modalReviewMobile.textContent = review.fullReview;
-
-    // 表示
+    
     modalOverlay.classList.add('active');
-
-    // bodyスクロール無効
     document.body.style.overflow = 'hidden';
 }
 
+// モーダルを閉じる関数
 function closeModal() {
     modalOverlay.classList.remove('active');
     document.body.style.overflow = 'auto';
 }
 
-// ---------------------------
-// 口コミグリッド描画
-// ---------------------------
+// 口コミカードを生成してグリッドに追加
 function renderReviews() {
     reviewsGrid.innerHTML = '';
     mockReviews.forEach(review => {
@@ -103,42 +88,40 @@ function renderReviews() {
     });
 }
 
-// ---------------------------
-// イベント設定
-// ---------------------------
+// イベントリスナーを設定
 function setupEventListeners() {
-    // 背景クリックで閉じる
+    // モーダル背景クリックで閉じる
     modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) closeModal();
+        if (e.target === modalOverlay) {
+            closeModal();
+        }
     });
 
-    // ESCキーで閉じる
+    // ESCキーでモーダルを閉じる
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal();
+        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+            closeModal();
+        }
     });
 
-    // ショップボタン
-    shopButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    // ソーシャルアイコンのクリックイベント
+    document.querySelectorAll('.social-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log('Shop button clicked');
-            // 必要に応じてリンク処理を追加
+            console.log('Social icon clicked:', icon.className);
         });
     });
 
-    // ソーシャルアイコン
-    socialIcons.forEach(icon => {
-        icon.addEventListener('click', (e) => {
+    // ショップボタンのクリックイベント
+    document.querySelectorAll('.shop-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log('Social icon clicked');
-            // 必要に応じてリンク処理を追加
+            console.log('Shop button clicked');
         });
     });
 }
 
-// ---------------------------
-// 初期化
-// ---------------------------
+// ページ読み込み時
 document.addEventListener('DOMContentLoaded', () => {
     renderReviews();
     setupEventListeners();
