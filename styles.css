@@ -173,7 +173,8 @@ body {
 .modal-content {
     position: relative;
     background-color: #d9d9d9;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
     max-width: 1536px;
     width: 100%;
     margin: 0 16px;
@@ -181,11 +182,7 @@ body {
     overflow-y: auto;
 }
 
-.modal-close {
-    display: none !important;
-}
-
-/* Desktop Modal Layout */
+/* デスクトップ用モーダル */
 .modal-desktop {
     display: none;
 }
@@ -219,7 +216,7 @@ body {
     justify-content: flex-start;
 }
 
-/* Mobile Modal Layout */
+/* モバイル用モーダル */
 .modal-mobile {
     display: block;
 }
