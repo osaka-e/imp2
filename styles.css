@@ -175,81 +175,47 @@ body {
     background-color: #d9d9d9;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
                 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    max-width: 800px;       /* 最大横幅を小さく */
-    width: 90%;             /* 画面幅に応じて縮小 */
-    margin: 0 auto;         /* 中央寄せ */
-    max-height: 80vh;       /* 高さも少し小さく */
-    overflow-y: auto;       /* 内容が多い場合は縦スクロール */
-    border-radius: 12px;    /* 角を丸くして柔らかい印象 */
-    padding: 20px;          /* 内側余白 */
+    max-width: 800px;
+    width: 90%;
+    margin: 0 auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 20px; 
 }
 
 /* デスクトップ用モーダル */
-.modal-desktop {
-    display: none;
+@media (min-width: 1024px) {
+    .modal-desktop-content {
+        padding: 80px 40px; /* 内側余白を調整 */
+        gap: 40px;          /* 左右カラムの間隔 */
+    }
+
+    .modal-image-container {
+        width: 300px;
+        height: 400px;
+    }
+
+    .modal-text-content {
+        width: calc(100% - 300px - 40px); /* 画像幅＋ギャップ分を引く */
+    }
 }
 
-.modal-desktop-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 123px 59px;
-    gap: 71px;
-}
+/* モバイル用レイアウト */
+@media (max-width: 1023px) {
+    .modal-mobile-content {
+        padding: 60px 20px; /* 内側余白を少し縮小 */
+        gap: 30px;
+    }
 
-.modal-left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 51px;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100%;
-}
+    .modal-image-container {
+        width: 240px;
+        height: 320px;
+    }
 
-.modal-right {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 51px;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-/* モバイル用モーダル */
-.modal-mobile {
-    display: block;
-}
-
-.modal-mobile-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: 123px 59px;
-    gap: 71px;
-}
-
-.modal-top {
-    display: flex;
-    flex-direction: column;
-    gap: 51px;
-    height: 587px;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-}
-
-.modal-bottom {
-    display: flex;
-    flex-direction: column;
-    gap: 51px;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
+    .modal-text-content {
+        width: 100%;
+    }
 }
 
 /* Image Container */
