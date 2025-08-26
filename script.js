@@ -151,8 +151,73 @@ function setupEventListeners() {
     });
 }
 
-// ページ読み込み時
-document.addEventListener('DOMContentLoaded', () => {
-    renderReviews();
-    setupEventListeners();
-});
+ // 追加
+const API_KEY = 'YOUR_API_KEY';
+const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID';
+const RANGE = 'シート1!A2:F'; // A2からF列まで（ヘッダーはA1にある想定）
+
+async function fetchSheetData() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.values; // 2次元配列
+}
+
+function createCard(item, index) {
+    const [imageUrl, name, review, insta, twitter, line] = item;
+
+    const card = document.createElement('div');
+    card.classList.add('review-card');
+    card.dataset.index = index;
+
+    card.innerHTML = `
+        <img class="review-card-image" src="${imageUrl}" alt="${name}">
+        <div class="review-card-name"><span>${name}</span></div>
+    `;
+
+    // クリックイベントでモーダルを開く
+    card.addEventListener('click', () => openModal(item));
+
+    return card;
+}
+
+function openModal(item) {
+    const [imageUrl, name, review, insta, twitter, line] = item;
+
+    document.querySelector('.modal-image').src = imageUrl;
+    document.querySelector('.modal-name').textContent = name;
+    document.querySelector('.modal-review').textContent = review;
+
+    // SNSリンク設定
+    document.querySelector('.social-icon.instagram').parentElement.href = insta || '#';
+    document.querySelector('.social-icon.twitter').parentElement.href = twitter || '#';
+    document.querySelector('.social-icon.line').parentElement.href = line || '#';
+
+    // Shopリンク設定
+    document.querySelector('.shop-btn').parentElement.href = 'https://newgridtone.stores.jp/';
+
+    document.querySelector('.modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+    document.querySelector('.modal-overlay').classList.remove('active');
+}
+
+async function init() {
+    const data = await fetchSheetData();
+    const container = document.querySelector('.reviews-grid');
+    container.innerHTML = '';
+
+    data.forEach((item, index) => {
+        const card = createCard(item, index);
+        container.appendChild(card);
+    });
+
+    // モーダルを閉じる処理
+    document.querySelector('.modal-overlay').addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) closeModal();
+    });
+}
+
+init();
+
