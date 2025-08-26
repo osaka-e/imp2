@@ -1,223 +1,153 @@
-// ---------------------------
-// サンプル口コミデータ
-// ---------------------------
-const mockReviews = [
-    {
-        id: '1',
-        name: '田中太郎',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=375&fit=crop&crop=face',
-        fullReview: '素晴らしいサービスでした！スタッフの方々がとても親切で、細かい要望にも快く対応していただきました。料理も美味しく、雰囲気も最高でした。また絶対に利用したいと思います。'
-    },
-    {
-        id: '2',
-        name: '佐藤花子',
-        image: 'https://images.unsplash.com/photo-1494790108755-2616b612b820?w=300&h=375&fit=crop&crop=face',
-        fullReview: 'とても満足しています。予約から当日まで、スムーズに進行しました。設備も充実していて、清潔感もありました。唯一、もう少し早い時間帯の予約が取れるとより良かったです。'
-    },
-     {
-        id: '3',
-        name: 'あああああああああああ',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=375&fit=crop&crop=face',
-        fullReview: '素晴らしいサービスでした！スタッフの方々がとても親切で、細かい要望にも快く対応していただきました。料理も美味しく、雰囲気も最高でした。また絶対に利用したいと思います。'
-    },   
-    {
-        id: '4',
-        name: '田中太郎',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=375&fit=crop&crop=face',
-        fullReview: '素晴らしいサービスでした！スタッフの方々がとても親切で、細かい要望にも快く対応していただきました。料理も美味しく、雰囲気も最高でした。また絶対に利用したいと思います。'
-    }, 
-    {
-        id: '5',
-        name: '田中太郎',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=375&fit=crop&crop=face',
-        fullReview: '素晴らしいサービスでした！スタッフの方々がとても親切で、細かい要望にも快く対応していただきました。料理も美味しく、雰囲気も最高でした。また絶対に利用したいと思います。'
-    }, 
-    {
-        id: '6',
-        name: '田中太郎',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=375&fit=crop&crop=face',
-        fullReview: '素晴らしいサービスでした！スタッフの方々がとても親切で、細かい要望にも快く対応していただきました。料理も美味しく、雰囲気も最高でした。また絶対に利用したいと思います。'
-    },
-    {
-        id: '7',
-        name: '田中太郎',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=375&fit=crop&crop=face',
-        fullReview: '素晴らしいサービスでした！スタッフの方々がとても親切で、細かい要望にも快く対応していただきました。料理も美味しく、雰囲気も最高でした。また絶対に利用したいと思います。'
-    },
-    // 他のレビューも同様に...
-];
+// ----------------------
+// Google API 設定
+// ----------------------
+const CLIENT_ID = "405109495210-f32ju85hhf3et71g0vj26p2kmk3supo1.apps.googleusercontent.com"; 
+const API_KEY = "AIzaSyDxM1ZnkdYiOVSfLLvu2uKFmgX1IeUmVUkY"; 
+const SHEET_ID = "1x7pWiIQyaxN7iMJh7cC7V5azEI8OkDrVn-CGNGKclYA"; 
+const RANGE = "Sheet1!A2:F"; 
 
-// DOM要素の取得
-const reviewsGrid = document.getElementById('reviewsGrid');
-const modalOverlay = document.getElementById('modalOverlay');
-const modalImageDesktop = document.getElementById('modalImageDesktop');
-const modalImageMobile = document.getElementById('modalImageMobile');
-const modalNameDesktop = document.getElementById('modalNameDesktop');
-const modalNameMobile = document.getElementById('modalNameMobile');
-const modalReviewDesktop = document.getElementById('modalReviewDesktop');
-const modalReviewMobile = document.getElementById('modalReviewMobile');
-
-// 名前の長さに応じたフォントサイズを計算する関数
-function calculateFontSize(nameLength) {
-    const baseSize = 20;
-    const minSize = 12;
-    const maxSize = 20;
-    return Math.max(minSize, Math.min(maxSize, baseSize - (nameLength - 1) * 0.5));
+// ----------------------
+// Google API 初期化
+// ----------------------
+function handleClientLoad() {
+  gapi.load('client:auth2', initClient);
 }
 
-// 口コミカードを生成する関数
-function createReviewCard(review) {
-    const card = document.createElement('div');
-    card.className = 'review-card';
-    card.setAttribute('data-review-id', review.id);
-    
-    const fontSize = calculateFontSize(review.name.length);
-    
+async function initClient() {
+  await gapi.client.init({
+    apiKey: API_KEY,
+    clientId: CLIENT_ID,
+    discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+    scope: "https://www.googleapis.com/auth/spreadsheets.readonly"
+  });
+
+  // ユーザーが未認証の場合はサインイン
+  if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+    await gapi.auth2.getAuthInstance().signIn();
+  }
+
+  // データ取得
+  fetchReviews();
+}
+
+// ----------------------
+// モーダル要素取得
+// ----------------------
+const modalOverlay = document.getElementById("modalOverlay");
+const modalDesktop = document.getElementById("modalDesktop");
+const modalMobile = document.getElementById("modalMobile");
+
+const modalNameDesktop = document.getElementById("modalNameDesktop");
+const modalReviewDesktop = document.getElementById("modalReviewDesktop");
+const modalImageDesktop = document.getElementById("modalImageDesktop");
+
+const modalNameMobile = document.getElementById("modalNameMobile");
+const modalReviewMobile = document.getElementById("modalReviewMobile");
+const modalImageMobile = document.getElementById("modalImageMobile");
+
+const shopLinks = document.querySelectorAll(".modal-shop-button .shop-btn");
+
+const socialIcons = {
+  desktop: {
+    instagram: modalDesktop.querySelector(".social-icon.instagram"),
+    twitter: modalDesktop.querySelector(".social-icon.twitter"),
+    line: modalDesktop.querySelector(".social-icon.line")
+  },
+  mobile: {
+    instagram: modalMobile.querySelector(".social-icon.instagram"),
+    twitter: modalMobile.querySelector(".social-icon.twitter"),
+    line: modalMobile.querySelector(".social-icon.line")
+  }
+};
+
+// ----------------------
+// Google Sheets データ取得
+// ----------------------
+async function fetchReviews() {
+  const response = await gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: RANGE
+  });
+
+  const rows = response.result.values || [];
+  const reviews = rows.map(row => ({
+    image: row[0] || "",
+    name: row[1] || "",
+    review: row[2] || "",
+    sns: {
+      instagram: row[3] || "#",
+      twitter: row[4] || "#",
+      line: row[5] || "#"
+    }
+  }));
+
+  renderReviews(reviews);
+}
+
+// ----------------------
+// レビューカード生成
+// ----------------------
+function renderReviews(reviews) {
+  const reviewsGrid = document.getElementById("reviewsGrid");
+  reviewsGrid.innerHTML = "";
+
+  reviews.forEach(data => {
+    const card = document.createElement("div");
+    card.classList.add("review-card");
     card.innerHTML = `
-        <img src="${review.image}" alt="${review.name}" class="review-card-image" onerror="this.style.backgroundColor='#d9d9d9'; this.style.backgroundImage='none';">
-        <div class="review-card-name">
-            <span style="font-size: ${fontSize}px;">${review.name}</span>
-        </div>
+      <img src="${data.image}" alt="${data.name}のレビュー画像" class="review-card-image">
+      <h3 class="review-card-name">${data.name}</h3>
+      <p class="review-card-text">${data.review}</p>
     `;
-    
-    // カードクリックでモーダルを開く
-    card.addEventListener('click', () => openModal(review));
-    
-    return card;
+    card.addEventListener("click", () => openModal(data));
+    reviewsGrid.appendChild(card);
+  });
 }
 
-// モーダルを開く関数
-function openModal(review) {
-    modalImageDesktop.src = review.image;
-    modalImageDesktop.alt = review.name;
-    modalImageMobile.src = review.image;
-    modalImageMobile.alt = review.name;
-    
-    modalNameDesktop.textContent = review.name;
-    modalNameMobile.textContent = review.name;
-    
-    modalReviewDesktop.textContent = review.fullReview;
-    modalReviewMobile.textContent = review.fullReview;
-    
-    modalOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+// ----------------------
+// モーダル表示
+// ----------------------
+function openModal(data) {
+  modalOverlay.style.display = "block";
+
+  // Desktop
+  modalNameDesktop.textContent = data.name;
+  modalReviewDesktop.textContent = data.review;
+  modalImageDesktop.src = data.image;
+
+  // Mobile
+  modalNameMobile.textContent = data.name;
+  modalReviewMobile.textContent = data.review;
+  modalImageMobile.src = data.image;
+
+  // SNSリンク設定
+  Object.keys(socialIcons.desktop).forEach(key => {
+    const url = data.sns[key];
+    socialIcons.desktop[key].onclick = () => window.open(url, "_blank");
+    socialIcons.mobile[key].onclick = () => window.open(url, "_blank");
+  });
+
+  // Shopリンク
+  shopLinks.forEach(link => {
+    link.onclick = () => window.open("https://newgridtone.stores.jp/", "_blank");
+  });
 }
 
-// モーダルを閉じる関数
-function closeModal() {
-    modalOverlay.classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
+// ----------------------
+// モーダル閉じる
+// ----------------------
+modalOverlay.addEventListener("click", (e) => {
+  if (e.target === modalOverlay) {
+    modalOverlay.style.display = "none";
+  }
+});
 
-// 口コミカードを生成してグリッドに追加
-function renderReviews() {
-    reviewsGrid.innerHTML = '';
-    mockReviews.forEach(review => {
-        const card = createReviewCard(review);
-        reviewsGrid.appendChild(card);
-    });
-}
-
-// イベントリスナーを設定
-function setupEventListeners() {
-    // モーダル背景クリックで閉じる
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) {
-            closeModal();
-        }
-    });
-
-    // ESCキーでモーダルを閉じる
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-            closeModal();
-        }
-    });
-
-    // ソーシャルアイコンのクリックイベント
-    document.querySelectorAll('.social-icon').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log('Social icon clicked:', icon.className);
-        });
-    });
-
-    // ショップボタンのクリックイベント
-    document.querySelectorAll('.shop-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log('Shop button clicked');
-        });
-    });
-}
-
- // 追加
-const API_KEY = 'YOUR_API_KEY';
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID';
-const RANGE = 'シート1!A2:F'; // A2からF列まで（ヘッダーはA1にある想定）
-
-async function fetchSheetData() {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.values; // 2次元配列
-}
-
-function createCard(item, index) {
-    const [imageUrl, name, review, insta, twitter, line] = item;
-
-    const card = document.createElement('div');
-    card.classList.add('review-card');
-    card.dataset.index = index;
-
-    card.innerHTML = `
-        <img class="review-card-image" src="${imageUrl}" alt="${name}">
-        <div class="review-card-name"><span>${name}</span></div>
-    `;
-
-    // クリックイベントでモーダルを開く
-    card.addEventListener('click', () => openModal(item));
-
-    return card;
-}
-
-function openModal(item) {
-    const [imageUrl, name, review, insta, twitter, line] = item;
-
-    document.querySelector('.modal-image').src = imageUrl;
-    document.querySelector('.modal-name').textContent = name;
-    document.querySelector('.modal-review').textContent = review;
-
-    // SNSリンク設定
-    document.querySelector('.social-icon.instagram').parentElement.href = insta || '#';
-    document.querySelector('.social-icon.twitter').parentElement.href = twitter || '#';
-    document.querySelector('.social-icon.line').parentElement.href = line || '#';
-
-    // Shopリンク設定
-    document.querySelector('.shop-btn').parentElement.href = 'https://newgridtone.stores.jp/';
-
-    document.querySelector('.modal-overlay').classList.add('active');
-}
-
-function closeModal() {
-    document.querySelector('.modal-overlay').classList.remove('active');
-}
-
-async function init() {
-    const data = await fetchSheetData();
-    const container = document.querySelector('.reviews-grid');
-    container.innerHTML = '';
-
-    data.forEach((item, index) => {
-        const card = createCard(item, index);
-        container.appendChild(card);
-    });
-
-    // モーダルを閉じる処理
-    document.querySelector('.modal-overlay').addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal-overlay')) closeModal();
-    });
-}
-
-init();
-
+// ----------------------
+// 初期化
+// ----------------------
+window.onload = () => {
+  const script = document.createElement("script");
+  script.src = "https://apis.google.com/js/api.js";
+  script.onload = handleClientLoad;
+  document.body.appendChild(script);
+};
