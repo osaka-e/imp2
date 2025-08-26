@@ -1,7 +1,6 @@
 // ----------------------
 // Google API 設定
 // ----------------------
-const CLIENT_ID = "405109495210-f32ju85hhf3et71g0vj26p2kmk3supo1.apps.googleusercontent.com"; 
 const API_KEY = "AIzaSyDxM1ZnkdYiOVSfLLvu2uKFmgX1IeUmVUkY"; 
 const SHEET_ID = "1x7pWiIQyaxN7iMJh7cC7V5azEI8OkDrVn-CGNGKclYA"; 
 const RANGE = "Sheet1!A2:F"; 
